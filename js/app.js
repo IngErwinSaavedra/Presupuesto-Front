@@ -1,5 +1,5 @@
 /**
- * Erwin Saavedra 19 - 05 - 2022
+ * Erwin Saavedra 26 - 05 - 2022
  */
 
 //Arreglo de Ingresos
@@ -23,7 +23,7 @@ let cargarApp = () => {
 //Funcion que captura el valor de ingresos
 let totalIngresos = () => {
     let totalIngreso = 0;
-    for(let ingreso of ingresos){
+    for (let ingreso of ingresos) {
         totalIngreso += ingreso.valor;
     }
     return totalIngreso;
@@ -32,7 +32,7 @@ let totalIngresos = () => {
 //Funcion que captura el valor de egresos
 let totalEgresos = () => {
     let totalEgreso = 0;
-    for(let egreso of egresos){
+    for (let egreso of egresos) {
         totalEgreso += egreso.valor;
     }
     return totalEgreso;
@@ -47,7 +47,7 @@ let totalEgresos = () => {
 
 let cargarCabecero = () => {
     let presupuesto = totalIngresos() - totalEgresos();
-    let porcentajeEgreso = totalEgresos()/totalIngresos();
+    let porcentajeEgreso = totalEgresos() / totalIngresos();
     document.getElementById('presupuesto').innerHTML = formatoMoneda(presupuesto);
     document.getElementById('porcentaje').innerHTML = formatoPorcentaje(porcentajeEgreso);
     document.getElementById('ingresos').innerHTML = formatoMoneda(totalIngresos());
@@ -55,16 +55,16 @@ let cargarCabecero = () => {
 }
 
 const formatoMoneda = (valor) => {
-    return valor.toLocaleString('es-CL',{style:'currency', currency:'CLP', minimumFractionDigits:0});
+    return valor.toLocaleString('es-CL', { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 });
 }
 
 const formatoPorcentaje = (valor) => {
-    return valor.toLocaleString('es-CL',{style:'percent', minimumFractionDigits:2});
+    return valor.toLocaleString('es-CL', { style: 'percent', minimumFractionDigits: 2 });
 }
 
 const cargarIngresos = () => {
     let ingresosHTML = '';
-    for(let ingreso of ingresos){
+    for (let ingreso of ingresos) {
         ingresosHTML += crearIngresoHTML(ingreso);
     }
     document.getElementById('lista-ingresos').innerHTML = ingresosHTML;
@@ -96,9 +96,11 @@ const eliminarIngreso = (id) => {
     cargarIngresos();
 }
 
+let pegreso = localStorage.getItem
+
 const cargarEgresos = () => {
     let egresosHTML = '';
-    for(let egreso of egresos) {
+    for (let egreso of egresos) {
         egresosHTML += crearEgresoHTML(egreso);
     }
     document.getElementById('lista-egresos').innerHTML = egresosHTML;
@@ -110,7 +112,7 @@ const crearEgresoHTML = (egreso) => {
                     <div class="elemento_descripcion">${egreso.descripcion}</div>
                     <div class="derecha limpiarEstilos">
                         <div class="elemento_valor">- ${formatoMoneda(egreso.valor)}</div>
-                        <div class="elemento_porcentaje">${formatoPorcentaje(egreso.valor/totalEgresos())}</div>
+                        <div class="elemento_porcentaje">${formatoPorcentaje(egreso.valor / totalEgresos())}</div>
                         <div class="elemento_eliminar">
                             <button class="elemento_eliminar--btn">
                                 <ion-icon name="close-circle-outline"
@@ -137,15 +139,24 @@ let agregarDato = () => {
     let valor = forma['valor'];
 
     if (descripcion.value !== '' && valor.value !== '') {
-        if (tipo.value === 'ingreso') {
-            ingresos.push(new Ingreso(descripcion.value, +valor.value));
-            cargarCabecero();
-            cargarIngresos();
-        }
-        else if (tipo.value === 'egreso') {
-            egresos.push(new Egreso(descripcion.value, +valor.value));
-            cargarCabecero();
-            cargarEgresos();
+        if (valor.value > 0) {
+            if (tipo.value === 'ingreso') {
+                ingresos.push(new Ingreso(descripcion.value, +valor.value));
+                cargarCabecero();
+                cargarIngresos();
+            }
+            else if (tipo.value === 'egreso') {
+                if (valor.value > totalEgresos) {
+                    console.log("Error egreso");
+                    window.alert('Error, No se aceptan valores superiores a Total egreso');
+                } else {
+                    egresos.push(new Egreso(descripcion.value, +valor.value));
+                    cargarCabecero();
+                    cargarEgresos();
+                }
+            }
+        } else {
+            console.log('Error');
         }
     }
 }
